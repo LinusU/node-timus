@@ -43,25 +43,24 @@ function test(args, cb) {
   fs.readFile(path.resolve('.timus'), function (err, data) {
     if (err) { throw err; }
 
+    var src = path.resolve('main.c');
     var bin = path.resolve('a.out');
     var info = JSON.parse(data);
-    var samples = info.samples;
 
-    var i = 1;
-    var next = function () {
-      if (samples.length === 0) { return cb(null); }
-      var sample = samples.shift();
+    timus.build(src, bin, function (err) {
+      if (err) { return cb(err); }
 
-      timus.test.runSample(bin, sample, function (err) {
-        if (err) { return cb(err); }
+      var ee = timus.test.runArray(bin, info.samples);
 
-        console.log('Sample ' + (i++) + ' ok');
-        next();
+      ee.on('ok', function (i) {
+        console.log('Sample ' + (i + 1) + ' ok');
       });
 
-    };
+      ee.on('error', cb);
+      ee.on('finish', cb);
 
-    next();
+    });
+
   });
 
 }
