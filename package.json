@@ -1,0 +1,16 @@
+{
+  "name": "timus",
+  "version": "0.1.0",
+  "license": "MIT",
+  "author": "Linus Unnebäck <linus@folkdatorn.se>",
+  "bin": "bin/timus",
+  "main": "index.js",
+  "preferGlobal": true,
+  "dependencies": {
+    "cheerio": "^0.18.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/LinusU/node-timus.git"
+  }
+}

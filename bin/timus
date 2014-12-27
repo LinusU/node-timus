@@ -1,0 +1,85 @@
+#!/usr/bin/env node
+
+process.title = 'timus';
+
+process.on('uncaughtException', function (err) {
+  process.stderr.write(err.name + ': ' + err.message + '\n');
+  process.exit(1);
+});
+
+var fs = require('fs');
+var path = require('path');
+
+var timus = require('../');
+var args = process.argv.slice(2);
+
+function checkout(args, cb) {
+
+  var id = Number(args[1]);
+  var dir = path.resolve('' + id);
+
+  timus.checkout(id, dir, cb);
+}
+
+function update(args, cb) {
+
+  // TODO: check for `.timus`, read `id` if found
+  var id = Number(args[1]);
+  var dir = path.resolve('.timus');
+
+  timus.update(id, dir, cb);
+}
+
+function build(args, cb) {
+
+  var src = path.resolve('main.c');
+  var dst = path.resolve('a.out');
+
+  timus.build(src, dst, cb);
+}
+
+function test(args, cb) {
+
+  fs.readFile(path.resolve('.timus'), function (err, data) {
+    if (err) { throw err; }
+
+    var bin = path.resolve('a.out');
+    var info = JSON.parse(data);
+    var samples = info.samples;
+
+    var i = 1;
+    var next = function () {
+      if (samples.length === 0) { return cb(null); }
+      var sample = samples.shift();
+
+      timus.test.runSample(bin, sample, function (err) {
+        if (err) { return cb(err); }
+
+        console.log('Sample ' + (i++) + ' ok');
+        next();
+      });
+
+    };
+
+    next();
+  });
+
+}
+
+function usage() {
+  process.stderr.write('Usage: timus <cmd>\n');
+}
+
+var cb = function (err) {
+  if (err) { throw err; }
+
+  console.log('done');
+};
+
+switch (args[0]) {
+  case 'checkout': checkout(args, cb); break;
+  case 'update': update(args, cb); break;
+  case 'build': build(args, cb); break;
+  case 'test': test(args, cb); break;
+  default: usage();
+}
