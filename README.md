@@ -49,6 +49,22 @@ timus test
 
 Build `main.c` and run it against the fetched sample data.
 
+### `login`
+
+```sh
+timus login <JudgeID> <Password>
+```
+
+Login to the server and save credentials.
+
+### `submit`
+
+```sh
+timus submit
+```
+
+Submit `main.c` to the server and wait for solution verdict.
+
 ## License
 
 MIT

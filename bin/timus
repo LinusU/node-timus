@@ -38,6 +38,35 @@ function build(args, cb) {
   timus.build(src, dst, cb);
 }
 
+function login(args, cb) {
+
+  var judge = args[1];
+  var password = args[2];
+
+  timus.login(judge, password, cb);
+}
+
+function submit(args, cb) {
+
+  fs.readFile(path.resolve('.timus'), function (err, data) {
+    if (err) { throw err; }
+
+    var src = path.resolve('main.c');
+    var info = JSON.parse(data);
+
+    fs.readFile(src, function (err, source) {
+      timus.submit(info.id, source, function (err, status) {
+        if (err) { return cb(err); }
+
+        console.log('Solution verdict:', status.verdict);
+        cb(null);
+      });
+    });
+
+  });
+
+}
+
 function test(args, cb) {
 
   fs.readFile(path.resolve('.timus'), function (err, data) {
@@ -78,7 +107,9 @@ var cb = function (err) {
 switch (args[0]) {
   case 'checkout': checkout(args, cb); break;
   case 'update': update(args, cb); break;
+  case 'submit': submit(args, cb); break;
   case 'build': build(args, cb); break;
+  case 'login': login(args, cb); break;
   case 'test': test(args, cb); break;
   default: usage();
 }
