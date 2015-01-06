@@ -1,17 +1,25 @@
 #!/usr/bin/env node
 
 process.title = 'timus';
-
-process.on('uncaughtException', function (err) {
-  process.stderr.write(err.name + ': ' + err.message + '\n');
-  process.exit(1);
-});
+process.on('uncaughtException', uncaughtException);
 
 var fs = require('fs');
 var path = require('path');
+var printDiff = require('print-diff');
 
 var timus = require('../');
 var args = process.argv.slice(2);
+
+function uncaughtException(err) {
+
+  process.stderr.write(err.name + ': ' + err.message + '\n');
+
+  if (err.actual && err.expected) {
+    printDiff(err.actual, err.expected);
+  }
+
+  process.exit(1);
+}
 
 function checkout(args, cb) {
 
@@ -101,7 +109,7 @@ function usage() {
 var cb = function (err) {
   if (err) { throw err; }
 
-  console.log('done');
+  process.stderr.write('done\n');
 };
 
 switch (args[0]) {
